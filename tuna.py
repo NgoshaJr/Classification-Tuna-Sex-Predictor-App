@@ -7,16 +7,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score
 
-# Function to remove outliers using the IQR method
-def remove_outliers(df, column):
-    Q1 = df[column].quantile(0.25)
-    Q3 = df[column].quantile(0.75)
-    IQR = Q3 - Q1
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
-    df_filtered = df.loc[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
-    return df_filtered
-
 # Load the data and remove the "Unnamed: 0" column
 df = pd.read_csv('tunadata_cleaned.csv')
 df = df.drop(columns=['Unnamed: 0'])
@@ -34,11 +24,6 @@ st.sidebar.write(df.head())
 # Get the features and target
 X = df[['gonadalWeight', 'focalLength']]
 y = df['Sex']
-
-# Remove outliers from 'gonadalWeight' and 'focalLength' columns
-X = remove_outliers(X, 'gonadalWeight')
-X = remove_outliers(X, 'focalLength')
-y = y[X.index]  # Update target after removing outliers
 
 # Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2)
@@ -66,32 +51,7 @@ if st.button("Click here to predict"):
     else:
         st.write("The tuna is Male.")
 
-# Visualization dropdown menu
-st.header("Data Visualization")
-visualization_option = st.selectbox("Select Visualization:", ["None", "Box Plot", "Histogram", "Scatter Plot"])
 
-# Set the Seaborn configuration to disable the warning
-st.set_option('deprecation.showPyplotGlobalUse', False)
-
-if visualization_option == "Box Plot":
-    st.subheader("Box Plot for 'gonadalWeight'")
-    sns.boxplot(data=X.assign(Sex=y), x='Sex', y='gonadalWeight')
-    plt.xlabel('Sex')
-    plt.ylabel('gonadalWeight')
-    st.pyplot()
-
-elif visualization_option == "Histogram":
-    st.subheader("Histogram for 'focalLength'")
-    sns.histplot(data=X.assign(Sex=y), x='focalLength', hue='Sex', kde=True)
-    plt.xlabel('focalLength')
-    st.pyplot()
-
-elif visualization_option == "Scatter Plot":
-    st.subheader("Scatter Plot for 'gonadalWeight' and 'focalLength'")
-    sns.scatterplot(data=X.assign(Sex=y), x='gonadalWeight', y='focalLength', hue='Sex')
-    plt.xlabel('gonadalWeight')
-    plt.ylabel('focalLength')
-    st.pyplot()
 
 # Model Evaluation
 st.header("Model Evaluation")
