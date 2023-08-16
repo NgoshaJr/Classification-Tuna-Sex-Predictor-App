@@ -22,7 +22,7 @@ st.sidebar.subheader("First five rows of the dataset")
 st.sidebar.write(df.head())
 
 # Get the features and target
-X = df[['gonadalWeight', 'focalLength']]
+X = df[['weight', 'focalLength']]  # Replaced 'gonadalWeight' with 'weight'
 y = df['Sex']
 
 # Split the dataset into training and testing sets
@@ -40,18 +40,16 @@ testing_accuracy = accuracy_score(y_test, adboost.predict(X_test))
 st.title("Tuna Sex Predictor App")
 st.header("Predict Tuna Sex")
 
-gonadal_weight = st.number_input("Enter gonadalWeight", min_value=X['gonadalWeight'].min(), max_value=X['gonadalWeight'].max(), value=X['gonadalWeight'].mean(), step=0.01)
+weight = st.number_input("Enter weight", min_value=X['weight'].min(), max_value=X['weight'].max(), value=X['weight'].mean(), step=0.01)  # Replaced 'gonadalWeight' with 'weight'
 focal_length = st.number_input("Enter focalLength", min_value=X['focalLength'].min(), max_value=X['focalLength'].max(), value=X['focalLength'].mean(), step=0.01)
 
 if st.button("Click here to predict"):
-    input_data = np.array([gonadal_weight, focal_length]).reshape(1, -1)
+    input_data = np.array([weight, focal_length]).reshape(1, -1)
     prediction = adboost.predict(input_data)
     if prediction[0] == 0:
         st.write("The tuna is Female.")
     else:
         st.write("The tuna is Male.")
-
-
 
 # Model Evaluation
 st.header("Model Evaluation")
