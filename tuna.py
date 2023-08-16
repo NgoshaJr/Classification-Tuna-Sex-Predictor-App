@@ -4,7 +4,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 
 # Load the data and remove the "Unnamed: 0" column
@@ -28,13 +29,18 @@ y = df['Sex']
 # Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2)
 
-# Train an AdaBoost classifier
-adboost = AdaBoostClassifier()
-adboost.fit(X_train, y_train)
+# Standardize the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train a Logistic Regression model
+logreg = LogisticRegression()
+logreg.fit(X_train_scaled, y_train)
 
 # Get the accuracy on the training and testing sets
-training_accuracy = accuracy_score(y_train, adboost.predict(X_train))
-testing_accuracy = accuracy_score(y_test, adboost.predict(X_test))
+training_accuracy = accuracy_score(y_train, logreg.predict(X_train_scaled))
+testing_accuracy = accuracy_score(y_test, logreg.predict(X_test_scaled))
 
 # Input data to predict
 st.title("Tuna Sex Predictor App")
@@ -45,7 +51,8 @@ focal_length = st.number_input("Enter focalLength", min_value=X['focalLength'].m
 
 if st.button("Click here to predict"):
     input_data = np.array([weight, focal_length]).reshape(1, -1)
-    prediction = adboost.predict(input_data)
+    input_data_scaled = scaler.transform(input_data)
+    prediction = logreg.predict(input_data_scaled)
     if prediction[0] == 0:
         st.write("The tuna is Female.")
     else:
